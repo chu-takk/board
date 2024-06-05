@@ -17,21 +17,21 @@ export default {
             }
         }
     },
-    mounted(){
+    mounted() {
         this.$axios.get("/board/" + this.$route.params.id)
             .then(response => {
                 this.board = response.data;
-
             })
     },
     methods: {
-        submit(){
+        submit() {
             this.$axios.post("/board/modify", this.board)
-            .then(response=>{
-                if(response.data.result == "success"){
-                this.$router.push("/view/" + this.$route.params.id);
-                }
-            })
+                .then(response => {
+                    if (response.data.result == "success") {
+                        this.$router.push("/view/" + this.$route.params.id);
+                    }
+                })
+
         }
     }
 }

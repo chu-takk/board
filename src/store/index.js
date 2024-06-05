@@ -10,7 +10,7 @@ export default createStore({
     setLoginUser(state, user) {
       state.loginUser = user
     },
-    logout(state){
+    logout(state) {
       state.loginUser = null
     }
   },

@@ -9,20 +9,15 @@
                     <th>작성자</th>
                     <th>작성일</th>
                 </tr>
-
             </thead>
             <tbody>
-                <tr v-for="board in boardList" @click="moveView(board)">
+                <tr v-for="board in boardList" :key="board.no" @click="moveView(board)">
                     <td>
                         {{ board.no }}
                     </td>
                     <td>{{ board.title }}</td>
                     <td>{{ board.viewCount }}</td>
-                    <td>
-                        <div v-if="board.writerUser">
-                            {{ board.writerUser.name }}
-                        </div>
-                    </td>
+                    <td>{{ board.writer }}</td>
                     <td>{{ formattedWriteDate(board.writeDate) }}</td>
                 </tr>
             </tbody>
@@ -31,75 +26,52 @@
         <v-pagination :length="totalPage" @update:modelValue="updatePage"></v-pagination>
 
         <div class="text-right">
-            <v-btn color="primary" variant="outlined" @click="moveWrite">글쓰기</v-btn>
+            <v-btn v-if="isLoggedIn" color="primary" variant="outlined" @click="moveWrite">글쓰기</v-btn>
         </div>
-        <number-counter v-model="count1" label="값1"></number-counter>
-        <number-counter v-model="count2" label="값2"></number-counter>
     </div>
 </template>
+
 <script>
 import moment from "moment"
-import NumberCounter from "@/components/NumberCounter.vue";
+import { mapState } from 'vuex'
 
 export default {
-    components: {
-        NumberCounter
-    },
     data() {
         return { //변수를 선언하는 영역
             page: 1,
-            count1:0,
-            count2:0,
             totalPage: 0,
             boardList: []
         }
     },
     computed: {
-        ageSum() {
-            let sum = 0;
-            for (let i = 0; i < this.arr.length; i++) {
-                sum += this.arr[i].age;
-            }
-            return sum;
+        ...mapState(['loginUser']),
+        isLoggedIn() {
+            return this.loginUser !== null;
         }
     },
-    mounted(){
+    mounted() {
         this.getBoardList();
-
     },
     methods: {
         formattedWriteDate(date) {
-            return moment(date).format("YYYY-MM-DD")
+            return moment(date).format("YYYY-MM-DD HH:mm:ss")
         },
 
-        updatePage(page){
+        updatePage(page) {
             console.log(page)
             this.page = page
             this.getBoardList()
         },
-        getBoardList(){
-            this.$axios.post("/board/list", { page : this.page })
-            .then((response) =>{
-                this.boardList = response.data.boardList;
-                this.totalPage = response.data.totalPage;
-            })
-
+        getBoardList() {
+            this.$axios.post("/board/list", { page: this.page })
+                .then((response) => {
+                    this.boardList = response.data.boardList;
+                    this.totalPage = response.data.totalPage;
+                })
         },
 
-        addPerson() {
-            this.arr.push({
-                name: this.name,
-                age: this.age
-            })
-        },
         moveWrite() {
-            if(this.$store.state.loginUser){
-                this.$router.push("/write");
-            }
-            else{
-                alert("로그인이 필요합니다.")
-                this.$router.push("/login")
-            }
+            this.$router.push("/write");
         },
         moveView(board) {
             this.$router.push("/view/" + board.no);
@@ -107,6 +79,7 @@ export default {
     }
 }
 </script>
+
 <style lang="less">
 @line-color: #999;
 
@@ -135,8 +108,4 @@ table {
         border-bottom: 1px solid @line-color;
     }
 }
-
-// table th, table td{
-//     border-bottom:1px solid #999;
-// }
 </style>

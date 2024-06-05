@@ -1,13 +1,5 @@
 function model(Sequelize, connection) {
-    /*
-    {
-        no: 1,
-        title: "제목1",
-        viewCount: 100,
-        writer: "홍길동",
-        writeDate: "2021-01-01"
-    },*/
-    var Board = connection.define("board", {
+    connection.define("board", {
         no: {
             type: Sequelize.INTEGER,
             primaryKey: true,
@@ -29,45 +21,45 @@ function model(Sequelize, connection) {
         writeDate: {
             type: Sequelize.DATE,
             defaultValue: Sequelize.NOW
+        },
+        address: {
+            type: Sequelize.STRING
+        },
+        latitude: {
+            type: Sequelize.DECIMAL(10, 8),
+            allowNull: true
+        },
+        longitude: {
+            type: Sequelize.DECIMAL(11, 8),
+            allowNull: true
         }
-    })
+    });
 
-    var User =connection.define("user",{
-        no:{
+    connection.define("user", {
+        no: {
             type: Sequelize.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        id:{
+        id: {
             type: Sequelize.STRING,
-            uniqe: true
+            unique: true
         },
-        password:{
+        password: {
             type: Sequelize.STRING
         },
-        name: { 
+        name: {
             type: Sequelize.STRING
         },
         joinDate: {
             type: Sequelize.DATE,
             defaultValue: Sequelize.NOW
         }
-
-    })
-    User.hasMany(Board,{
-        as:"boards",
-        foreignKey:"writerId"
-    })
-    Board.belongsTo(User,{
-        as:"writerUser",
-        foreignKey: "writerId"
-    })
-
-
+    });
 
     connection.sync({
         alter: true
-    })
+    });
 }
 
 module.exports = model;

@@ -14,8 +14,7 @@ const routes = [
   },
   {
     path: "/join",
-    component : join
-
+    component: join
   },
   {
     path: "/",
@@ -30,7 +29,7 @@ const routes = [
     component: view
   },
   {
-    path:"/modify/:id",
+    path: "/modify/:id",
     component: modify
   }
 ]

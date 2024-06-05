@@ -10,12 +10,12 @@ var usersRouter = require('./routes/users');
 var app = express();
 
 var { Sequelize } = require('sequelize');
-var sequelize = new Sequelize("board", "root", "itc801", {
+var sequelize = new Sequelize("board", "root", "root", {
   host: "localhost",
   dialect: "mysql"
-})
-global.sequelize = sequelize
-require("./model")(Sequelize, sequelize)
+});
+global.sequelize = sequelize;
+require("./model")(Sequelize, sequelize);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -30,22 +30,20 @@ const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 
 const options = {
-	host: 'localhost',
-	port: 3306,
-	user: 'root',
-	password: 'itc801',
-	database: 'board'
+  host: 'localhost',
+  port: 3306,
+  user: 'root',
+  password: 'root',
+  database: 'board'
 };
 const sessionStore = new MySQLStore(options);
-
 app.use(session({
-	key: 'session_id',
-	secret: 'board!@#sdf#$%',
-	store: sessionStore,
-	resave: false,
-	saveUninitialized: false
+  key: 'session_id',
+  secret: 'board!@#sdf#$%',
+  store: sessionStore,
+  resave: false,
+  saveUninitialized: false
 }));
-
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -59,11 +57,8 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
   res.status(err.status || 500);
   res.render('error');
 });
