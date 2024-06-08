@@ -1,65 +1,106 @@
-function model(Sequelize, connection) {
-    connection.define("board", {
-        no: {
-            type: Sequelize.INTEGER,
-            primaryKey: true,
-            autoIncrement: true
-        },
-        title: {
-            type: Sequelize.STRING,
-        },
-        content: {
-            type: Sequelize.TEXT
-        },
-        viewCount: {
-            type: Sequelize.INTEGER,
-            defaultValue: 0
-        },
-        writer: {
-            type: Sequelize.STRING
-        },
-        writeDate: {
-            type: Sequelize.DATE,
-            defaultValue: Sequelize.NOW
-        },
-        address: {
-            type: Sequelize.STRING
-        },
-        latitude: {
-            type: Sequelize.DECIMAL(10, 8),
-            allowNull: true
-        },
-        longitude: {
-            type: Sequelize.DECIMAL(11, 8),
-            allowNull: true
-        }
-    });
+const { Sequelize, DataTypes } = require('sequelize');
 
-    connection.define("user", {
-        no: {
-            type: Sequelize.INTEGER,
-            primaryKey: true,
-            autoIncrement: true
-        },
-        id: {
-            type: Sequelize.STRING,
-            unique: true
-        },
-        password: {
-            type: Sequelize.STRING
-        },
-        name: {
-            type: Sequelize.STRING
-        },
-        joinDate: {
-            type: Sequelize.DATE,
-            defaultValue: Sequelize.NOW
-        }
-    });
+const sequelize = new Sequelize("board", "root", "root", {
+  host: "localhost",
+  dialect: "mysql"
+});
 
-    connection.sync({
-        alter: true
-    });
-}
+const User = sequelize.define("user", {
+  no: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  id: {
+    type: DataTypes.STRING,
+    unique: true
+  },
+  password: {
+    type: DataTypes.STRING
+  },
+  name: {
+    type: DataTypes.STRING
+  },
+  joinDate: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  grade: {
+    type: DataTypes.STRING,
+    defaultValue: 'basic'
+  }
+});
 
-module.exports = model;
+const Board = sequelize.define("board", {
+  no: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  title: {
+    type: DataTypes.STRING,
+  },
+  content: {
+    type: DataTypes.TEXT
+  },
+  viewCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  writer: {
+    type: DataTypes.STRING
+  },
+  writeDate: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  address: {
+    type: DataTypes.STRING
+  },
+  latitude: {
+    type: DataTypes.DECIMAL(10, 8),
+    allowNull: true
+  },
+  longitude: {
+    type: DataTypes.DECIMAL(11, 8),
+    allowNull: true
+  }
+});
+
+const Comment = sequelize.define("comment", {
+  no: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  content: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  writer: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  boardId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Board,
+      key: 'no'
+    }
+  }
+});
+
+Board.hasMany(Comment, { foreignKey: 'boardId' });
+Comment.belongsTo(Board, { foreignKey: 'boardId' });
+
+sequelize.sync({
+  alter: true
+});
+
+module.exports = {
+  sequelize,
+  User,
+  Board,
+  Comment
+};

@@ -5,7 +5,7 @@
         <div class="write-date">{{ formattedDate(board.writeDate) }}</div>
         <div class="view-count">조회수 : {{ board.viewCount }}</div>
         <div class="content">{{ board.content }}</div>
-        
+
         <!-- 지도 및 로드뷰 레이아웃 -->
         <v-card>
             <v-card-title>지도 및 로드뷰</v-card-title>
@@ -14,20 +14,27 @@
                 <div id="roadview" class="map-roadview"></div>
             </v-card-text>
         </v-card>
-        
+
         <v-layout>
             <v-btn color="primary" @click="moveList">목록</v-btn>
             <v-spacer></v-spacer>
-            <v-btn color="primary" @click="moveModify">수정</v-btn>
-            <v-btn color="red" @click="removeBoard">삭제</v-btn>
+            <v-btn color="primary" v-if="isAuthor" @click="moveModify">수정</v-btn>
+            <v-btn color="red" v-if="isAuthor" @click="removeBoard">삭제</v-btn>
         </v-layout>
+
+        <!-- 댓글 컴포넌트 추가 -->
+        <comment :board-id="this.$route.params.id"></comment>
     </div>
 </template>
 
 <script>
 import moment from "moment";
+import Comment from './Comment.vue';  // 경로를 수정
 
 export default {
+    components: {
+        Comment
+    },
     data() {
         return {
             board: {
@@ -38,15 +45,17 @@ export default {
                 address: "",
                 latitude: null,
                 longitude: null
-            }
+            },
+            isAuthor: false
         };
     },
     mounted() {
         const no = this.$route.params.id;
+        const user = JSON.parse(localStorage.getItem('user'));
         this.$axios.get(`/board/${no}`)
             .then(response => {
                 this.board = response.data;
-                console.log('Board data:', this.board); // 디버깅을 위해 추가
+                this.isAuthor = user && user.username === this.board.writer;
                 if (this.board.latitude && this.board.longitude) {
                     this.$nextTick(() => {
                         this.displayMap();

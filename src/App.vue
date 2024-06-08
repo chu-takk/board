@@ -11,41 +11,33 @@
           <v-btn v-if="!$store.state.loginUser" to="/login" variant="text">로그인</v-btn>
         </v-layout>
       </div>
-
       <router-view />
     </v-main>
   </v-app>
 </template>
 
 <script>
-
 export default {
   name: 'App',
-
-  data: () => ({
-    //
-  }),
   mounted() {
-    this.$axios.post("/user/info")
-      .then(response => {
-        if (response.data.result == "success") {
-          this.$store.commit("setLoginUser", response.data.user)
-        }
-
-      })
+    this.$axios.post('/user/info').then((response) => {
+      if (response.data.result === 'success') {
+        this.$store.commit('setLoginUser', response.data.user);
+      }
+    });
   },
   methods: {
     logout() {
-      this.$axios.post("/user/logout")
-        .then(response => {
-          if (response.data.result == "success") {
-            this.$store.commit("logout")
-          }
-        })
-    }
-  }
-}
+      this.$axios.post('/user/logout').then((response) => {
+        if (response.data.result === 'success') {
+          this.$store.commit('logout');
+        }
+      });
+    },
+  },
+};
 </script>
+
 <style lang="less">
 .header-bar {
   padding: 10px;
